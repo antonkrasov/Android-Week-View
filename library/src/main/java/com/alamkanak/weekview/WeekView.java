@@ -141,7 +141,7 @@ public class WeekView extends View {
             mStickyScroller.forceFinished(true);
 
             if (mCurrentFlingDirection == Direction.HORIZONTAL) {
-                mScroller.fling((int) mCurrentOrigin.x, 0, (int) (velocityX * mXScrollingSpeed), 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, 0);
+                mScroller.fling((int) mCurrentOrigin.x, 0, (int) (velocityX * mXScrollingSpeed), 0, (int) (mCurrentOrigin.x - mWidthPerDay - mColumnGap), (int) (mCurrentOrigin.x + mWidthPerDay + mColumnGap), 0, 0);
             } else if (mCurrentFlingDirection == Direction.VERTICAL) {
                 mScroller.fling(0, (int) mCurrentOrigin.y, 0, (int) velocityY, 0, 0, (int) -(mHourHeight * 48 + mHeaderTextHeight + mHeaderRowPadding * 2 - getHeight()), 0);
             }

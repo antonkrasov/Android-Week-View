@@ -16,6 +16,7 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
@@ -31,6 +32,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Timer;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -108,6 +110,7 @@ public class WeekView extends View {
     private EmptyViewClickListener mEmptyViewClickListener;
     private EmptyViewLongPressListener mEmptyViewLongPressListener;
     private DateTimeInterpreter mDateTimeInterpreter;
+    private OnDayChangedListener mOnDayChangedListener;
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
@@ -939,6 +942,11 @@ public class WeekView extends View {
     //
     /////////////////////////////////////////////////////////////////
 
+
+    public void setOnDayChangedListener(OnDayChangedListener onDayChangedListener) {
+        mOnDayChangedListener = onDayChangedListener;
+    }
+
     public void setOnEventClickListener(EventClickListener listener) {
         this.mEventClickListener = listener;
     }
@@ -1346,10 +1354,21 @@ public class WeekView extends View {
             if (Math.abs(mScroller.getFinalX() - mScroller.getCurrX()) < mWidthPerDay + mColumnGap && Math.abs(mScroller.getFinalX() - mScroller.getStartX()) != 0) {
                 mScroller.forceFinished(true);
                 float leftDays = Math.round(mCurrentOrigin.x / (mWidthPerDay + mColumnGap));
-                if (mScroller.getFinalX() < mScroller.getCurrX())
+                if (mScroller.getFinalX() < mScroller.getCurrX()) {
+                    if (mOnDayChangedListener != null) {
+                        Calendar calendar = (Calendar) getFirstVisibleDay().clone();
+                        calendar.add(Calendar.DATE, 1);
+                        mOnDayChangedListener.onDayChanged(calendar);
+                    }
+
                     leftDays--;
-                else
+                } else {
+                    if (mOnDayChangedListener != null) {
+                        mOnDayChangedListener.onDayChanged((Calendar) getFirstVisibleDay().clone());
+                    }
+
                     leftDays++;
+                }
                 int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * (mWidthPerDay + mColumnGap));
                 mStickyScroller.startScroll((int) mCurrentOrigin.x, 0, -nearestOrigin, 0);
                 ViewCompat.postInvalidateOnAnimation(WeekView.this);
@@ -1440,26 +1459,29 @@ public class WeekView extends View {
     //
     /////////////////////////////////////////////////////////////////
 
-    public interface EventClickListener {
+    public static interface EventClickListener {
         public void onEventClick(WeekViewEvent event, RectF eventRect);
     }
 
-    public interface MonthChangeListener {
+    public static interface MonthChangeListener {
         public List<WeekViewEvent> onMonthChange(int newYear, int newMonth);
     }
 
-    public interface EventLongPressListener {
+    public static interface EventLongPressListener {
         public void onEventLongPress(WeekViewEvent event, RectF eventRect);
     }
 
-    public interface EmptyViewClickListener {
+    public static interface EmptyViewClickListener {
         public void onEmptyViewClicked(Calendar time);
     }
 
-    public interface EmptyViewLongPressListener {
+    public static interface EmptyViewLongPressListener {
         public void onEmptyViewLongPress(Calendar time);
     }
 
+    public static interface OnDayChangedListener {
+        public void onDayChanged(Calendar calendar);
+    }
 
     /////////////////////////////////////////////////////////////////
     //

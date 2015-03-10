@@ -754,20 +754,20 @@ public class WeekView extends View {
      * @param event The event to cache.
      */
     private void cacheEvent(WeekViewEvent event) {
-        if (!isSameDay(event.getStartTime(), event.getEndTime())) {
-            Calendar endTime = (Calendar) event.getStartTime().clone();
-            endTime.set(Calendar.HOUR_OF_DAY, 23);
-            endTime.set(Calendar.MINUTE, 59);
-            Calendar startTime = (Calendar) event.getEndTime().clone();
-            startTime.set(Calendar.HOUR_OF_DAY, 0);
-            startTime.set(Calendar.MINUTE, 0);
-            WeekViewEvent event1 = new WeekViewEvent(event.getId(), event.getName(), event.getStartTime(), endTime);
-            event1.setColor(event.getColor());
-            WeekViewEvent event2 = new WeekViewEvent(event.getId(), event.getName(), startTime, event.getEndTime());
-            event2.setColor(event.getColor());
-            mEventRects.add(new EventRect(event1, event, null));
-            mEventRects.add(new EventRect(event2, event, null));
-        } else
+//        if (!isSameDay(event.getStartTime(), event.getEndTime())) {
+//            Calendar endTime = (Calendar) event.getStartTime().clone();
+//            endTime.set(Calendar.HOUR_OF_DAY, 23);
+//            endTime.set(Calendar.MINUTE, 59);
+//            Calendar startTime = (Calendar) event.getEndTime().clone();
+//            startTime.set(Calendar.HOUR_OF_DAY, 0);
+//            startTime.set(Calendar.MINUTE, 0);
+//            WeekViewEvent event1 = new WeekViewEvent(event.getId(), event.getName(), event.getStartTime(), endTime);
+//            event1.setColor(event.getColor());
+//            WeekViewEvent event2 = new WeekViewEvent(event.getId(), event.getName(), startTime, event.getEndTime());
+//            event2.setColor(event.getColor());
+//            mEventRects.add(new EventRect(event1, event, null));
+//            mEventRects.add(new EventRect(event2, event, null));
+//        } else
             mEventRects.add(new EventRect(event, event, null));
     }
 

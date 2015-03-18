@@ -16,7 +16,6 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
@@ -32,7 +31,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Timer;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.

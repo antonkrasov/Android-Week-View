@@ -1443,10 +1443,10 @@ public class WeekView extends View {
             throw new IllegalArgumentException("Cannot scroll to an hour of negative value.");
         else if (hour > 24)
             throw new IllegalArgumentException("Cannot scroll to an hour of value greater than 24.");
-        else if (hour * mHourHeight > mHourHeight * 24 - getHeight() + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom)
+        else if (hour * mHourHeight > mHourHeight * 24 * 2 - getHeight() + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom)
             throw new IllegalArgumentException("Cannot scroll to an hour which will result the calendar to go off the screen.");
 
-        int verticalOffset = (int) (mHourHeight * hour);
+        int verticalOffset = (int) (mHourHeight * hour * 2);
         mCurrentOrigin.y = -verticalOffset;
         invalidate();
     }

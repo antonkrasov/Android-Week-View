@@ -1013,7 +1013,8 @@ public class WeekView extends View {
                     else amPm = "PM";
                     if (hour == 0) hour = 12;
                     if (hour > 12) hour -= 12;
-                    return String.format("%02d:%d %s", hour, minutes, amPm);
+
+                    return String.format("%d:%02d %s", hour, minutes, amPm);
                 }
             };
         }

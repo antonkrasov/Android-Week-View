@@ -766,7 +766,7 @@ public class WeekView extends View {
 //            mEventRects.add(new EventRect(event1, event, null));
 //            mEventRects.add(new EventRect(event2, event, null));
 //        } else
-            mEventRects.add(new EventRect(event, event, null));
+        mEventRects.add(new EventRect(event, event, null));
     }
 
     /**
@@ -1448,6 +1448,15 @@ public class WeekView extends View {
 
         int verticalOffset = (int) (mHourHeight * hour * 2);
         mCurrentOrigin.y = -verticalOffset;
+
+        if (mCurrentOrigin.y - mDistanceY > 0) {
+            mCurrentOrigin.y = 0;
+        } else if (mCurrentOrigin.y - mDistanceY < -(mHourHeight * 48 + mHeaderTextHeight + mHeaderRowPadding * 2 - getHeight())) {
+            mCurrentOrigin.y = -(mHourHeight * 48 + mHeaderTextHeight + mHeaderRowPadding * 2 - getHeight());
+        } else {
+            mCurrentOrigin.y -= mDistanceY;
+        }
+
         invalidate();
     }
 

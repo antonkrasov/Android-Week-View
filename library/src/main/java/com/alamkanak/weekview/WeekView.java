@@ -14,8 +14,8 @@ import android.support.v4.view.ViewCompat;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
@@ -614,10 +614,13 @@ public class WeekView extends View {
             int lineCount = textLayout.getLineCount();
             int availableLineCount = (int) Math.floor(lineCount * availableHeight / textLayout.getHeight());
             float widthAvailable = (rect.right - originalLeft - mEventPadding * 2) * availableLineCount;
-            textLayout = new StaticLayout(TextUtils.ellipsize(text, mEventTextPaint, widthAvailable, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+            setTextSizeForWidth(mEventTextPaint, widthAvailable, availableHeight, text);
+            textLayout = new StaticLayout(text, mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+
         } else if (lineHeight >= availableHeight) {
             int width = (int) (rect.right - originalLeft - mEventPadding * 2);
-            textLayout = new StaticLayout(TextUtils.ellipsize(text, mEventTextPaint, width, TextUtils.TruncateAt.END), mEventTextPaint, width, Layout.Alignment.ALIGN_NORMAL, 1.0f, 1.0f, false);
+            setTextSizeForWidth(mEventTextPaint, width, availableHeight, text);
+            textLayout = new StaticLayout(text, mEventTextPaint, width, Layout.Alignment.ALIGN_NORMAL, 1.0f, 1.0f, false);
         }
 
         // Draw text
@@ -625,8 +628,28 @@ public class WeekView extends View {
         canvas.translate(originalLeft + mEventPadding, originalTop + mEventPadding);
         textLayout.draw(canvas);
         canvas.restore();
+        mEventTextPaint.setTextSize(mEventTextSize);
     }
+    // See: http://stackoverflow.com/a/21895626
+    private void setTextSizeForWidth(Paint paint, float desiredWidth, float desiredHeight,
+                                            String text) {
 
+        // Pick a reasonably large value for the test. Larger values produce
+        // more accurate results, but may cause problems with hardware
+        // acceleration. But there are workarounds for that, too; refer to
+        // http://stackoverflow.com/questions/6253528/font-size-too-large-to-fit-in-cache
+        final float testTextSize = mEventTextSize;
+
+        // Get the bounds of the text, using our testTextSize.
+        paint.setTextSize(testTextSize);
+        Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+
+        // Calculate the desired size as a proportion of our testTextSize.
+        float desiredTextSize = testTextSize * (desiredWidth / bounds.width()) * ((bounds.height()/ 2)/ (desiredHeight / 5));
+        // Set the paint for that size.
+        paint.setTextSize(desiredTextSize);
+    }
 
     /**
      * A class to hold reference to the events and their visual representation. An EventRect is

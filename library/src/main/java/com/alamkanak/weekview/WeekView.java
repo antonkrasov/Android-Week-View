@@ -62,6 +62,7 @@ public class WeekView extends View {
     private Paint mTodayBackgroundPaint;
     private Paint mTodayHeaderTextPaint;
     private Paint mEventBackgroundPaint;
+    private Paint mEventBorderPaint;
     private float mHeaderColumnWidth;
     private List<EventRect> mEventRects;
     private TextPaint mEventTextPaint;
@@ -317,6 +318,9 @@ public class WeekView extends View {
         mEventBackgroundPaint = new Paint();
         mEventBackgroundPaint.setColor(Color.rgb(174, 208, 238));
 
+        mEventBorderPaint = new Paint();
+        mEventBorderPaint.setStyle(Paint.Style.STROKE);
+        mEventBorderPaint.setColor(Color.WHITE);
         // Prepare header column background color.
         mHeaderColumnBackgroundPaint = new Paint();
         mHeaderColumnBackgroundPaint.setColor(mHeaderColumnBackgroundColor);
@@ -578,6 +582,7 @@ public class WeekView extends View {
                         mEventRects.get(i).rectF = eventRectF;
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         canvas.drawRect(mEventRects.get(i).rectF, mEventBackgroundPaint);
+                        canvas.drawRect(mEventRects.get(i).rectF, mEventBorderPaint);
                         drawText(mEventRects.get(i).event.getName(), mEventRects.get(i).rectF, canvas, originalTop, originalLeft);
                     } else
                         mEventRects.get(i).rectF = null;

@@ -295,7 +295,7 @@ public class WeekView extends View {
         mCurrentTimeLinePaint = new Paint();
         mCurrentTimeLinePaint.setColor(Color.BLUE);
         mCurrentTimeLinePaint.setStyle(Paint.Style.STROKE);
-        mCurrentTimeLinePaint.setStrokeWidth(3);
+        mCurrentTimeLinePaint.setStrokeWidth(2);
         mCurrentTimeCirclePaint = new Paint();
         mCurrentTimeCirclePaint.setColor(Color.BLUE);
         mCurrentTimeCirclePaint.setStyle(Paint.Style.FILL);
@@ -444,7 +444,7 @@ public class WeekView extends View {
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
 
-
+        canvas.drawLine(mHeaderColumnWidth, 0, mHeaderColumnWidth, getHeight(), mHourSeparatorPaint);
         // Iterate through each day.
         mFirstVisibleDay = (Calendar) mToday.clone();
         mFirstVisibleDay.add(Calendar.DATE, leftDaysWithGaps);
@@ -495,12 +495,13 @@ public class WeekView extends View {
             if(sameDay){
                 float startY = mCurrentOrigin.y + ((float) mHourHeight) * (c.get(Calendar.HOUR_OF_DAY) + c.get(Calendar.MINUTE)/60f) * 2f;
                 float startX = (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
-                canvas.drawLine(startX, startY, startX + mWidthPerDay, startY, mCurrentTimeLinePaint);
-                canvas.drawCircle(startX, startY, 10f, mCurrentTimeCirclePaint);
+                canvas.drawLine(startX, startY, startPixel + mWidthPerDay, startY, mCurrentTimeLinePaint);
+                canvas.drawCircle(startX, startY, 6f, mCurrentTimeCirclePaint);
             }
             // In the next iteration, start from the next day.
             startPixel += mWidthPerDay + mColumnGap;
         }
+
 
 //        // Draw the header background.
 //        canvas.drawRect(0, 0, getWidth(), mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);

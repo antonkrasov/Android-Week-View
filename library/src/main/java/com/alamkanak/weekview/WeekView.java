@@ -15,7 +15,6 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
@@ -30,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -62,6 +62,8 @@ public class WeekView extends View {
     private Paint mTodayBackgroundPaint;
     private Paint mTodayHeaderTextPaint;
     private Paint mEventBackgroundPaint;
+    private Paint mCurrentTimeLinePaint;
+    private Paint mCurrentTimeCirclePaint;
     private Paint mEventBorderPaint;
     private float mHeaderColumnWidth;
     private List<EventRect> mEventRects;
@@ -289,6 +291,14 @@ public class WeekView extends View {
         mHeaderTextHeight = rect.height();
         mHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
 
+        // Line for current time
+        mCurrentTimeLinePaint = new Paint();
+        mCurrentTimeLinePaint.setColor(Color.BLUE);
+        mCurrentTimeLinePaint.setStyle(Paint.Style.STROKE);
+        mCurrentTimeLinePaint.setStrokeWidth(3);
+        mCurrentTimeCirclePaint = new Paint();
+        mCurrentTimeCirclePaint.setColor(Color.BLUE);
+        mCurrentTimeCirclePaint.setStyle(Paint.Style.FILL);
         // Prepare header background paint.
         mHeaderBackgroundPaint = new Paint();
         mHeaderBackgroundPaint.setColor(mHeaderRowBackgroundColor);
@@ -323,7 +333,7 @@ public class WeekView extends View {
         mEventBorderPaint.setColor(Color.WHITE);
         // Prepare header column background color.
         mHeaderColumnBackgroundPaint = new Paint();
-        mHeaderColumnBackgroundPaint.setColor(mHeaderColumnBackgroundColor);
+        mHeaderColumnBackgroundPaint.setColor(Color.TRANSPARENT);
 
         // Prepare event text size and color.
         mEventTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
@@ -429,6 +439,12 @@ public class WeekView extends View {
             }
         }
 
+
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+
+
         // Iterate through each day.
         mFirstVisibleDay = (Calendar) mToday.clone();
         mFirstVisibleDay.add(Calendar.DATE, leftDaysWithGaps);
@@ -476,7 +492,12 @@ public class WeekView extends View {
 
             // Draw the events.
             drawEvents(day, startPixel, canvas);
-
+            if(sameDay){
+                float startY = mCurrentOrigin.y + ((float) mHourHeight) * (c.get(Calendar.HOUR_OF_DAY) + c.get(Calendar.MINUTE)/60f) * 2f;
+                float startX = (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
+                canvas.drawLine(startX, startY, startX + mWidthPerDay, startY, mCurrentTimeLinePaint);
+                canvas.drawCircle(startX, startY, 10f, mCurrentTimeCirclePaint);
+            }
             // In the next iteration, start from the next day.
             startPixel += mWidthPerDay + mColumnGap;
         }

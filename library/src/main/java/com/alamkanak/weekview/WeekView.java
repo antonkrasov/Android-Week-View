@@ -15,6 +15,7 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
@@ -440,7 +441,6 @@ public class WeekView extends View {
         }
 
 
-
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
 
@@ -492,8 +492,8 @@ public class WeekView extends View {
 
             // Draw the events.
             drawEvents(day, startPixel, canvas);
-            if(sameDay){
-                float startY = mCurrentOrigin.y + ((float) mHourHeight) * (c.get(Calendar.HOUR_OF_DAY) + c.get(Calendar.MINUTE)/60f) * 2f;
+            if (sameDay) {
+                float startY = mCurrentOrigin.y + ((float) mHourHeight) * (c.get(Calendar.HOUR_OF_DAY) + c.get(Calendar.MINUTE) / 60f) * 2f;
                 float startX = (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
                 canvas.drawLine(startX, startY, startPixel + mWidthPerDay, startY, mCurrentTimeLinePaint);
                 canvas.drawCircle(startX, startY, 6f, mCurrentTimeCirclePaint);
@@ -652,9 +652,10 @@ public class WeekView extends View {
         canvas.restore();
         mEventTextPaint.setTextSize(mEventTextSize);
     }
+
     // See: http://stackoverflow.com/a/21895626
     private void setTextSizeForWidth(Paint paint, float desiredWidth, float desiredHeight,
-                                            String text) {
+                                     String text) {
 
         // Pick a reasonably large value for the test. Larger values produce
         // more accurate results, but may cause problems with hardware
@@ -668,7 +669,7 @@ public class WeekView extends View {
         paint.getTextBounds(text, 0, text.length(), bounds);
 
         // Calculate the desired size as a proportion of our testTextSize.
-        float desiredTextSize = testTextSize * (desiredWidth / bounds.width()) * ((bounds.height()/ 2)/ (desiredHeight / 5));
+        float desiredTextSize = testTextSize * (desiredWidth / bounds.width()) * ((bounds.height() / 2) / (desiredHeight / 5));
         // Set the paint for that size.
         paint.setTextSize(desiredTextSize);
     }
@@ -802,21 +803,39 @@ public class WeekView extends View {
      * @param event The event to cache.
      */
     private void cacheEvent(WeekViewEvent event) {
-//        if (!isSameDay(event.getStartTime(), event.getEndTime())) {
-//            Calendar endTime = (Calendar) event.getStartTime().clone();
-//            endTime.set(Calendar.HOUR_OF_DAY, 23);
-//            endTime.set(Calendar.MINUTE, 59);
-//            Calendar startTime = (Calendar) event.getEndTime().clone();
-//            startTime.set(Calendar.HOUR_OF_DAY, 0);
-//            startTime.set(Calendar.MINUTE, 0);
-//            WeekViewEvent event1 = new WeekViewEvent(event.getId(), event.getName(), event.getStartTime(), endTime);
-//            event1.setColor(event.getColor());
-//            WeekViewEvent event2 = new WeekViewEvent(event.getId(), event.getName(), startTime, event.getEndTime());
-//            event2.setColor(event.getColor());
-//            mEventRects.add(new EventRect(event1, event, null));
-//            mEventRects.add(new EventRect(event2, event, null));
-//        } else
-        mEventRects.add(new EventRect(event, event, null));
+        if (!isSameDay(event.getStartTime(), event.getEndTime())) {
+
+            int numDayInEvent = daysBetween(event.getStartTime(), event.getEndTime());
+            // for startTime+1 ==> numDayInEvent -1
+            Log.v(this.getClass().getName(), "cacheEvent + numDayInEvents" + numDayInEvent);
+            for (int indexDay = 0; indexDay <= numDayInEvent; indexDay++) {
+                Calendar endTime = (Calendar) event.getStartTime().clone();
+                endTime.set(Calendar.DAY_OF_YEAR, event.getStartTime().get(Calendar.DAY_OF_YEAR) + indexDay);
+                endTime.set(Calendar.HOUR_OF_DAY, 23);
+                endTime.set(Calendar.MINUTE, 59);
+                Calendar startTime = (Calendar) event.getStartTime().clone();
+                startTime.set(Calendar.DAY_OF_YEAR, event.getStartTime().get(Calendar.DAY_OF_YEAR) + indexDay);
+                startTime.set(Calendar.HOUR_OF_DAY, 0);
+                startTime.set(Calendar.MINUTE, 0);
+                if (indexDay == numDayInEvent) {
+                    WeekViewEvent eventEnd = new WeekViewEventImpl(startTime, event.getEndTime(), event.getName(), event.getColor(), event.getId());
+                    mEventRects.add(new EventRect(eventEnd, event, null));
+                } else if (indexDay == 0) {
+                    WeekViewEvent eventStart = new WeekViewEventImpl(event.getStartTime(), endTime, event.getName(), event.getColor(), event.getId());
+                    mEventRects.add(new EventRect(eventStart, event, null));
+                } else {
+                    WeekViewEvent eventMiddle = new WeekViewEventImpl(startTime, endTime, event.getName(), event.getColor(), event.getId());
+                    mEventRects.add(new EventRect(eventMiddle, event, null));
+                }
+            }
+        } else
+            mEventRects.add(new EventRect(event, event, null));
+    }
+
+    public static int daysBetween(Calendar startDate, Calendar endDate) {
+        long end = endDate.getTimeInMillis();
+        long start = startDate.getTimeInMillis();
+        return (int) Math.ceil(((float) ((float) Math.abs(end - start) / (float) (24 * 60 * 60 * 1000))));
     }
 
     /**

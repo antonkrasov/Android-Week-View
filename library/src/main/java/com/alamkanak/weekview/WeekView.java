@@ -113,6 +113,7 @@ public class WeekView extends View {
     private EmptyViewLongPressListener mEmptyViewLongPressListener;
     private DateTimeInterpreter mDateTimeInterpreter;
     private OnDayChangedListener mOnDayChangedListener;
+    private OnEmptyTimeClickListener mOnEmptyTimeClickListener;
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
@@ -178,6 +179,11 @@ public class WeekView extends View {
                     playSoundEffect(SoundEffectConstants.CLICK);
                     mEmptyViewClickListener.onEmptyViewClicked(selectedTime);
                 }
+            }
+
+            if (mOnEmptyTimeClickListener != null) {
+                int[] hm = getHourAndMinutesFromPoint(e.getY());
+                mOnEmptyTimeClickListener.onEmptyTimeClick(hm[0], hm[1]);
             }
 
             return super.onSingleTapConfirmed(e);
@@ -543,9 +549,8 @@ public class WeekView extends View {
                     && x > start && x < startPixel + mWidthPerDay) {
                 Calendar day = (Calendar) mToday.clone();
                 day.add(Calendar.DATE, dayNumber - 1);
-                float pixelsFromZero = y - mCurrentOrigin.y - mHeaderTextHeight
-                        - mHeaderRowPadding * 2 - mTimeTextHeight / 2 - mHeaderMarginBottom;
-                int hour = (int) (pixelsFromZero / mHourHeight);
+                float pixelsFromZero = y - mCurrentOrigin.y - mHeaderTextHeight - mHeaderRowPadding * 2 - mTimeTextHeight / 2 - mHeaderMarginBottom;
+                int hour = (int) (pixelsFromZero / mHourHeight / 2);
                 int minute = (int) (60 * (pixelsFromZero - hour * mHourHeight) / mHourHeight);
                 day.add(Calendar.HOUR, hour);
                 day.set(Calendar.MINUTE, minute);
@@ -554,6 +559,18 @@ public class WeekView extends View {
             startPixel += mWidthPerDay + mColumnGap;
         }
         return null;
+    }
+
+    private int[] getHourAndMinutesFromPoint(float y) {
+        int[] result = new int[2];
+        float pixelsFromZero = y - mCurrentOrigin.y - mTimeTextHeight / 2;
+        int hour = (int) (pixelsFromZero / mHourHeight / 2);
+        int minute = (int) (pixelsFromZero / mHourHeight) % 2;
+
+        result[0] = hour;
+        result[1] = minute == 0 ? 0 : 30;
+
+        return result;
     }
 
     /**
@@ -1012,6 +1029,10 @@ public class WeekView extends View {
 
     public void setOnDayChangedListener(OnDayChangedListener onDayChangedListener) {
         mOnDayChangedListener = onDayChangedListener;
+    }
+
+    public void setOnEmptyTimeClickListener(OnEmptyTimeClickListener onEmptyTimeClickListener) {
+        mOnEmptyTimeClickListener = onEmptyTimeClickListener;
     }
 
     public void setOnEventClickListener(EventClickListener listener) {
@@ -1558,6 +1579,10 @@ public class WeekView extends View {
 
     public static interface OnDayChangedListener {
         public void onDayChanged(Calendar calendar);
+    }
+
+    public static interface OnEmptyTimeClickListener {
+        public void onEmptyTimeClick(int hour, int minute);
     }
 
     /////////////////////////////////////////////////////////////////

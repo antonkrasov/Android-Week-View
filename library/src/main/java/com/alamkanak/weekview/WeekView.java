@@ -510,8 +510,10 @@ public class WeekView extends View {
             if (sameDay) {
                 float startY = mCurrentOrigin.y + ((float) mHourHeight) * (c.get(Calendar.HOUR_OF_DAY) + c.get(Calendar.MINUTE) / 60f) * 2f;
                 float startX = (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
-                canvas.drawLine(startX, startY, startPixel + mWidthPerDay, startY, mCurrentTimeLinePaint);
-                canvas.drawCircle(startX, startY, 6f, mCurrentTimeCirclePaint);
+                if(startX >= mHeaderColumnWidth) {
+                    canvas.drawLine(startX, startY, startX + mWidthPerDay, startY, mCurrentTimeLinePaint);
+                    canvas.drawCircle(startX, startY, 6f, mCurrentTimeCirclePaint);
+                }
             }
             // In the next iteration, start from the next day.
             startPixel += mWidthPerDay + mColumnGap;

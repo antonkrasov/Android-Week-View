@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -66,6 +67,7 @@ public class WeekView extends View {
     private Paint mCurrentTimeLinePaint;
     private Paint mCurrentTimeCirclePaint;
     private Paint mEventBorderPaint;
+    private Paint mEventBorderDottedPaint;
     private float mHeaderColumnWidth;
     private List<EventRect> mEventRects;
     private TextPaint mEventTextPaint;
@@ -338,9 +340,16 @@ public class WeekView extends View {
         mEventBorderPaint = new Paint();
         mEventBorderPaint.setStyle(Paint.Style.STROKE);
         mEventBorderPaint.setColor(Color.WHITE);
+
+        mEventBorderDottedPaint = new Paint();
+        mEventBorderDottedPaint.setStyle(Paint.Style.STROKE);
+        mEventBorderDottedPaint.setColor(0xff585858);
+        mEventBorderDottedPaint.setStrokeWidth(getResources().getDisplayMetrics().density * 1);
+        mEventBorderDottedPaint.setPathEffect(new DashPathEffect(new float[]{getResources().getDisplayMetrics().density * 6, getResources().getDisplayMetrics().density * 6}, 0));
+
         // Prepare header column background color.
         mHeaderColumnBackgroundPaint = new Paint();
-        mHeaderColumnBackgroundPaint.setColor(Color.TRANSPARENT);
+        mHeaderColumnBackgroundPaint.setColor(mDayBackgroundColor);
 
         // Prepare event text size and color.
         mEventTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
@@ -621,7 +630,12 @@ public class WeekView extends View {
                         mEventRects.get(i).rectF = eventRectF;
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         canvas.drawRect(mEventRects.get(i).rectF, mEventBackgroundPaint);
-                        canvas.drawRect(mEventRects.get(i).rectF, mEventBorderPaint);
+                        if (mEventRects.get(i).event.getStyle() == WeekViewEvent.STYLE_NORMAL) {
+                            canvas.drawRect(mEventRects.get(i).rectF, mEventBorderPaint);
+                        } else {
+                            canvas.drawRect(mEventRects.get(i).rectF, mEventBorderDottedPaint);
+                        }
+                        mEventTextPaint.setColor(mEventRects.get(i).event.getTextColor());
                         drawText(mEventRects.get(i).event.getName(), mEventRects.get(i).rectF, canvas, originalTop, originalLeft);
                     } else
                         mEventRects.get(i).rectF = null;
@@ -835,13 +849,13 @@ public class WeekView extends View {
                 startTime.set(Calendar.HOUR_OF_DAY, 0);
                 startTime.set(Calendar.MINUTE, 0);
                 if (indexDay == numDayInEvent) {
-                    WeekViewEvent eventEnd = new WeekViewEventImpl(startTime, event.getEndTime(), event.getName(), event.getColor(), event.getId());
+                    WeekViewEvent eventEnd = new WeekViewEventImpl(startTime, event.getEndTime(), event.getName(), event.getColor(), event.getId(), event.getStyle(), event.getTextColor());
                     mEventRects.add(new EventRect(eventEnd, event, null));
                 } else if (indexDay == 0) {
-                    WeekViewEvent eventStart = new WeekViewEventImpl(event.getStartTime(), endTime, event.getName(), event.getColor(), event.getId());
+                    WeekViewEvent eventStart = new WeekViewEventImpl(event.getStartTime(), endTime, event.getName(), event.getColor(), event.getId(), event.getStyle(), event.getTextColor());
                     mEventRects.add(new EventRect(eventStart, event, null));
                 } else {
-                    WeekViewEvent eventMiddle = new WeekViewEventImpl(startTime, endTime, event.getName(), event.getColor(), event.getId());
+                    WeekViewEvent eventMiddle = new WeekViewEventImpl(startTime, endTime, event.getName(), event.getColor(), event.getId(), event.getStyle(), event.getTextColor());
                     mEventRects.add(new EventRect(eventMiddle, event, null));
                 }
             }

@@ -9,13 +9,17 @@ public class WeekViewEventImpl implements WeekViewEvent {
     private String mName;
     private int mColor;
     private long mId;
+    private int mStyle;
+    private int mTextColor;
 
-    public WeekViewEventImpl(Calendar startTime, Calendar endTime, String name, int color, long id) {
+    public WeekViewEventImpl(Calendar startTime, Calendar endTime, String name, int color, long id, int style, int textColor) {
         mStartTime = startTime;
         mEndTime = endTime;
         mName = name;
         mColor = color;
         mId = id;
+        mStyle = style;
+        mTextColor = textColor;
     }
 
     @Override
@@ -41,5 +45,15 @@ public class WeekViewEventImpl implements WeekViewEvent {
     @Override
     public long getId() {
         return mId;
+    }
+
+    @Override
+    public int getStyle() {
+        return mStyle;
+    }
+
+    @Override
+    public int getTextColor() {
+        return mTextColor;
     }
 }

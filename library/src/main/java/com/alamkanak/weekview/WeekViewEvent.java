@@ -1,5 +1,7 @@
 package com.alamkanak.weekview;
 
+import android.support.annotation.IntDef;
+
 import java.util.Calendar;
 
 /**
@@ -8,14 +10,21 @@ import java.util.Calendar;
  */
 public interface WeekViewEvent {
 
-    public Calendar getStartTime();
+    int STYLE_NORMAL = 1;
+    int STYLE_DOTTED = 2;
 
-    public Calendar getEndTime();
+    Calendar getStartTime();
 
-    public String getName();
+    Calendar getEndTime();
 
-    public int getColor();
+    String getName();
 
-    public long getId();
+    int getColor();
+
+    long getId();
+
+    int getStyle();
+
+    int getTextColor();
 
 }

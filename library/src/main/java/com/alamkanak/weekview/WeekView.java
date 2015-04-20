@@ -477,6 +477,8 @@ public class WeekView extends View {
             // Get more events if necessary. We want to store the events 3 months beforehand. Get
             // events only when it is the first iteration of the loop.
             if (mEventRects == null || mRefreshEvents || (dayNumber == leftDaysWithGaps + 1 && mFetchedMonths[1] != day.get(Calendar.MONTH) + 1 && day.get(Calendar.DAY_OF_MONTH) == 15)) {
+                Log.d("WeeView", "mRefreshEvents: " + mRefreshEvents);
+
                 getMoreEvents(day);
                 mRefreshEvents = false;
             }
@@ -1511,13 +1513,18 @@ public class WeekView extends View {
      * @param date The date to show.
      */
     public void goToDate(Calendar date) {
+        Log.d("WeekView", "goToDate()");
+
         mScroller.forceFinished(true);
         date.set(Calendar.HOUR_OF_DAY, 0);
         date.set(Calendar.MINUTE, 0);
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
 
-        mRefreshEvents = true;
+//        we don't need to refresh all, when we switch days, if we will switch to not loaded day, we will call
+//        notifyDatasetChanged() directly
+
+//        mRefreshEvents = true;
 
         Calendar today = Calendar.getInstance();
         today.set(Calendar.HOUR_OF_DAY, 0);
@@ -1535,6 +1542,7 @@ public class WeekView extends View {
      * Refreshes the view and loads the events again.
      */
     public void notifyDatasetChanged() {
+        Log.d("WeekView", "notifyDatasetChanged()");
         mRefreshEvents = true;
         invalidate();
     }
